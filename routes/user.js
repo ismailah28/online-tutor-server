@@ -10,6 +10,8 @@ const {
   makeAdminTutor,
 } = require('../controllers/user');
 
+const { bookLessonByStudent } = require('../controllers/lesson');
+
 const router = express.Router();
 
 router.use(protect);
@@ -23,6 +25,10 @@ router
   .route('/tutors/:tutId')
   .get(authorize('admin'), getTutorById)
   .put(authorize('admin'), deactivateTutor);
+
+router
+  .route('/tutors/:tutId/book')
+  .post(authorize('student'), bookLessonByStudent);
 
 router
   .route('/tutors/:tutId/make-admin')

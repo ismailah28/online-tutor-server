@@ -14,6 +14,7 @@ const auth = require('./routes/auth');
 const category = require('./routes/category');
 const subject = require('./routes/subject');
 const user = require('./routes/user');
+const lesson = require('./routes/lesson');
 
 const connectDB = require('./config/db');
 const errorHandler = require('./middlewares/error');
@@ -46,6 +47,7 @@ app.use('/api/v1/auth', auth);
 app.use('/api/v1/categories', category);
 app.use('/api/v1/subject', subject);
 app.use('/api/v1/users', user);
+app.use('/api/v1/lesson', lesson);
 
 // central error handler
 app.use(errorHandler);
