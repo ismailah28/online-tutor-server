@@ -11,6 +11,7 @@ require('dotenv').config();
 // route files
 const indexRouter = require('./routes');
 const auth = require('./routes/auth');
+const category = require('./routes/category');
 
 const connectDB = require('./config/db');
 const errorHandler = require('./middlewares/error');
@@ -40,6 +41,7 @@ app.use(cors());
 // mount routers
 app.use('/', indexRouter);
 app.use('/api/v1/auth', auth);
+app.use('/api/v1/categories', category);
 
 // central error handler
 app.use(errorHandler);
