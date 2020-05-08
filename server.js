@@ -13,6 +13,7 @@ const indexRouter = require('./routes');
 const auth = require('./routes/auth');
 const category = require('./routes/category');
 const subject = require('./routes/subject');
+const user = require('./routes/user');
 
 const connectDB = require('./config/db');
 const errorHandler = require('./middlewares/error');
@@ -44,6 +45,7 @@ app.use('/', indexRouter);
 app.use('/api/v1/auth', auth);
 app.use('/api/v1/categories', category);
 app.use('/api/v1/subject', subject);
+app.use('/api/v1/users', user);
 
 // central error handler
 app.use(errorHandler);
