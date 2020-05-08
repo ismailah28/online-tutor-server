@@ -54,4 +54,9 @@ userSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
+userSchema.pre(/^find/, function (next) {
+  this.populate('subjects subjects');
+  next();
+});
+
 module.exports = mongoose.model('User', userSchema);
