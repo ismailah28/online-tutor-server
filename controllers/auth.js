@@ -3,7 +3,7 @@ const ErrorResponse = require('../utils/errorResponse');
 const User = require('../models/User');
 
 // Utility function to get token from model, create cookie and send response
-const sendTokenResponse = (user, statusCode, res) => {
+const sendToken = (user, statusCode, res) => {
   // Create token
   const token = user.getSignedJwtToken();
 
@@ -28,22 +28,18 @@ const sendTokenResponse = (user, statusCode, res) => {
 // @route     POST /api/v1/auth/sign-up
 // @access    Public
 exports.signUp = asyncHandler(async (req, res, next) => {
-  const { firstName, lastName, email, password, role, isAdmin } = req.body;
-
-  if (role === 'admin')
-    return next(new ErrorResponse('You cant signup as an admin', 400));
+  const { firstName, lastName, email, password, role } = req.body;
 
   // Create user
   const user = await User.create({
     firstName,
     lastName,
     email,
-    isAdmin,
     password,
     role,
   });
 
-  sendTokenResponse(user, 200, res);
+  sendToken(user, 200, res);
 });
 
 // @desc      Login user
@@ -71,7 +67,7 @@ exports.signIn = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse('Invalid credentials', 401));
   }
 
-  sendTokenResponse(user, 200, res);
+  sendToken(user, 200, res);
 });
 
 // @desc      Log user out / clear cookie
@@ -136,5 +132,5 @@ exports.updatePassword = asyncHandler(async (req, res, next) => {
   user.password = req.body.newPassword;
   await user.save();
 
-  sendTokenResponse(user, 200, res);
+  sendToken(user, 200, res);
 });
