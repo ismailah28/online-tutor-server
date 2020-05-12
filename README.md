@@ -359,15 +359,46 @@ GET https://startng-tutor.herokuapp.com/api/v1/subjects?name=subject_name
 
 ### Lesson
 
+<<<<<<< HEAD
 #### POST Book a Lesson
 
 Student can book a lesson or admin can book a lesson for a student
+=======
+#### POST Book a Lesson By Student
+
+Book a lesson for a student.
+
+```
+POST https://startng-tutor.herokuapp.com/api/v1/users/tutors/:tutId/book
+```
+
+##### Access - Student User
+
+##### Params
+
+- tutId: Tutor Id
+
+##### Headers
+
+| Key           | Value            |
+| :------------ | :--------------- |
+| Content-Type  | application/json |
+| Authorization | Token            |
+
+#### POST Book a Lesson for a Student
+
+Book a lesson for a student.
+>>>>>>> chore: Add documentation to README (#9)
 
 ```
 POST https://startng-tutor.herokuapp.com/api/v1/lessons
 ```
 
+<<<<<<< HEAD
 ##### Access - Admin, Student User
+=======
+##### Access - Admin User
+>>>>>>> chore: Add documentation to README (#9)
 
 ##### Headers
 
@@ -380,10 +411,15 @@ POST https://startng-tutor.herokuapp.com/api/v1/lessons
 
 ```
 {
+<<<<<<< HEAD
 	"studentEmail": "student@tutorial.com", - optional for student booking lessons
 	"tutorEmail": "tutor@tutorial.com",
   "category": "jss",
   "subject": "English Language"
+=======
+	"studentEmail": "student@tutorial.com",
+	"tutorEmail": "tutor@tutorial.com"
+>>>>>>> chore: Add documentation to README (#9)
 }
 ```
 
