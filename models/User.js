@@ -21,6 +21,7 @@ const userSchema = new mongoose.Schema(
     role: {
       type: String,
       enum: ['student', 'tutor'],
+      required: [true, 'Please provide user role'],
     },
     password: {
       type: String,
@@ -32,6 +33,7 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// enable search on first name
 userSchema.index({ firstName: 'text' });
 
 // Encrypt password before saving
