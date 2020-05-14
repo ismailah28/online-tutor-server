@@ -29,7 +29,7 @@ subjectSchema.pre('remove', async function (next) {
   await this.model('User').updateMany({
     $pull: { subjects: this._id },
   });
-  next(y);
+  next();
 });
 
 module.exports = mongoose.model('Subject', subjectSchema);
