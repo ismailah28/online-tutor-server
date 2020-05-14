@@ -16,7 +16,9 @@ lessonSchema.pre(/^find/, function (next) {
   this.populate({
     path: 'student',
     select: 'firstName lastName email',
-  }).populate({ path: 'tutor', select: 'firstName lastName email subjects' });
+  })
+    .populate({ path: 'tutor', select: 'firstName lastName email subjects' })
+    .populate({ path: 'subject', select: 'name -_id' });
   next();
 });
 
