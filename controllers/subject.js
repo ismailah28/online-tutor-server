@@ -121,7 +121,9 @@ exports.deleteSubject = asyncHandler(async (req, res, next) => {
 // @access    Private
 exports.getSubjectsByName = asyncHandler(async (req, res, next) => {
   const { name } = req.query;
-  const subjects = await Subject.find({ $text: { $search: name } }).sort({
+  const subjects = await Subject.find({
+    name: { $regex: new RegExp(`${name.trim()}`), $options: 'i' },
+  }).sort({
     name: 1,
   });
 
