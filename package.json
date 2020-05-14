@@ -4,11 +4,7 @@
   "description": "Backend server for an online tutor app",
   "main": "server.js",
   "scripts": {
-<<<<<<< HEAD
-    "start": "NODE_ENV=production node server",
-=======
     "start": "set NODE_ENV=production && node server",
->>>>>>> develop
     "dev": "nodemon server"
   },
   "repository": {
