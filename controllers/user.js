@@ -1,5 +1,7 @@
 const asyncHandler = require('express-async-handler');
 const User = require('../models/User');
+const Category = require('../models/Category');
+const Subject = require('../models/Subject');
 const ErrorResponse = require('../utils/errorResponse');
 
 // @desc      Search tutor by first name
@@ -9,10 +11,10 @@ exports.getTutorByFirstName = asyncHandler(async (req, res, next) => {
   const { name } = req.query;
 
   const tutors = await User.find({
-    $text: { $search: name },
+    firstName: { $regex: new RegExp(`^${name.trim()}`), $options: 'i' },
     role: 'tutor',
   }).sort({
-    name: 1,
+    firstName: 1,
   });
   res.status(200).json({ success: true, data: tutors });
 });
@@ -50,7 +52,14 @@ exports.getTutorById = asyncHandler(async (req, res, next) => {
 // @route     PUT /api/v1/user/tutor/:tutId
 // @access    Private/Admin
 exports.deactivateTutor = asyncHandler(async (req, res, next) => {
-  const tutor = await User.findOneAndUpdate(
+  let tutor = await User.findOne({ _id: req.params.tutId, role: 'tutor' });
+  if (!tutor) {
+    return next(
+      new ErrorResponse(`Tutor with Id: ${req.params.tutId} does not exist`)
+    );
+  }
+
+  tutor = await User.findOneAndUpdate(
     { _id: req.params.tutId, role: 'tutor' },
     { isActive: false },
     { new: true, runValidators: true }
@@ -69,7 +78,28 @@ exports.tutorRegisterSubject = asyncHandler(async (req, res, next) => {
       ErrorResponse('Admin needs to be a tutor to take a course', 400)
     );
   }
-  const subject = await User.findByIdAndUpdate(
+
+  const category = await Category.findById(req.params.catId);
+  if (!category)
+    return next(
+      new ErrorResponse(
+        `Category with Id: ${req.params.catId} does not exist!`,
+        404
+      )
+    );
+
+  let subject = await Subject.findById(req.params.subId);
+
+  if (!subject) {
+    return next(
+      new ErrorResponse(
+        `Subject with Id: ${req.params.subId} does not exist!`,
+        404
+      )
+    );
+  }
+
+  subject = await User.findByIdAndUpdate(
     req.user._id,
     {
       $addToSet: { subjects: req.params.subId },
@@ -93,6 +123,20 @@ exports.getAllTutorSubjects = asyncHandler(async (req, res, next) => {
 // @route     PUT /api/v1/category/:catId/subject/:subId/delete
 // @access    Private/Tutor
 exports.deleteRegisteredSubject = asyncHandler(async (req, res, next) => {
+  // check if tutor takes subject
+  const tut = await User.findOne({
+    _id: req.user._id,
+    subjects: { $in: [req.params.subId] },
+  });
+
+  if (!tut) {
+    return next(
+      new ErrorResponse(
+        `Subject with Id: ${req.params.subId} not taken by tutor`
+      )
+    );
+  }
+
   const subjects = await User.findByIdAndUpdate(
     req.user._id,
     {
@@ -106,13 +150,16 @@ exports.deleteRegisteredSubject = asyncHandler(async (req, res, next) => {
 
 // @desc      Make tutor admin
 // @route     PUT /api/v1/users/tutors/:tutId/make-admin
-// @access    Private/Tutor
+// @access    Private/Admin
 exports.makeTutorAdmin = asyncHandler(async (req, res, next) => {
   let tutor = await User.findOne({ _id: req.params.tutId, role: 'tutor' });
 
-  if (!tutor)
+  if (!(tutor && tutor.isActive))
     return next(
-      new ErrorResponse(`Tutor with id ${req.params.tutId} does'nt exist.`, 404)
+      new ErrorResponse(
+        `Tutor with id ${req.params.tutId} does'nt exist or is not active.`,
+        404
+      )
     );
 
   tutor = await User.findOneAndUpdate(
