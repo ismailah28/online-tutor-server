@@ -1,14 +1,57 @@
 const asyncHandler = require('express-async-handler');
+
 const Lesson = require('../models/Lesson');
 const User = require('../models/User');
+const Subject = require('../models/Subject');
+const Category = require('../models/Category');
 const ErrorResponse = require('../utils/errorResponse');
 
 // @desc      Book lesson
 // @route     POST /api/v1/lesson
 // @access    Private/Student
-exports.bookLessonByAdmin = asyncHandler(async (req, res, next) => {
-  const student = await User.findOne({ email: req.body.studentEmail });
-  const tutor = await User.findOne({ email: req.body.tutorEmail });
+exports.bookLesson = asyncHandler(async (req, res, next) => {
+  let { categoryName, studentEmail } = req.body;
+  const { subjectName, tutorEmail } = req.body;
+
+  // subjectName = subjectName.toLowerCase();
+  categoryName = categoryName.toLowerCase();
+
+  if (
+    !(
+      categoryName === 'primary' ||
+      categoryName === 'jss' ||
+      categoryName === 'sss'
+    )
+  ) {
+    return next(
+      new ErrorResponse(
+        `Category with name ${categoryName} does not exist`,
+        400
+      )
+    );
+  }
+  const category = await Category.findOne({ name: categoryName });
+
+  const subject = await Subject.findOne({
+    category: category._id,
+    name: subjectName,
+  });
+
+  if (!subject) {
+    return next(
+      new ErrorResponse(
+        `Subject with name: ${subjectName} does not exist or don't belong to category ${categoryName}`,
+        404
+      )
+    );
+  }
+
+  // check if request is made by student
+  if (req.user.role === 'student') {
+    studentEmail = req.user.email;
+  }
+  const student = await User.findOne({ email: studentEmail });
+  const tutor = await User.findOne({ email: tutorEmail });
 
   if (!student) {
     return next(
@@ -27,41 +70,34 @@ exports.bookLessonByAdmin = asyncHandler(async (req, res, next) => {
     );
   }
 
-  const lesson = await Lesson.create({
+  // check if tutor teaches subject
+  const tutorTakesSubject = tutor.subjects.filter((sub) =>
+    sub._id.equals(subject._id)
+  );
+
+  if (!(tutorTakesSubject.length > 0)) {
+    return next(
+      new ErrorResponse(
+        `Tutor with email '${tutorEmail}' don't take '${subjectName}' subject in '${categoryName}' category`,
+        400
+      )
+    );
+  }
+
+  // create lesson
+  let lesson = await Lesson.create({
     student: student._id,
     tutor: tutor._id,
+    subject: subject._id,
   });
+
+  lesson = await lesson
+    .populate('student', 'firstName lastName email')
+    .populate('tutor', 'firstName lastName email subjects')
+    .populate('subject', 'name')
+    .execPopulate();
 
   res.status(201).json({ success: true, data: lesson });
-});
-
-// @desc      Book lesson
-// @route     POST /api/v1/user/tutor/:tutId/book
-// @access    Private/Student
-exports.bookLessonByStudent = asyncHandler(async (req, res, next) => {
-  const tutor = await User.findById(req.params.tutId);
-
-  // check if tutor exists
-  if (!tutor._id) {
-    return next(
-      new ErrorResponse(`Tutor with id:${req.params.tutId} does not exit!`, 404)
-    );
-  }
-
-  // check if tutor is active
-  if (!tutor.isActive) {
-    return next(
-      new ErrorResponse(`Tutor with id:${req.params.tutId} is not active`, 404)
-    );
-  }
-
-  // proceed and book lesson
-  const student = await Lesson.create({
-    tutor: req.params.tutId,
-    student: req.user._id,
-  });
-
-  res.status(201).json({ success: true, data: student });
 });
 
 // @desc      Get all lessons

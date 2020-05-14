@@ -1,7 +1,7 @@
 const express = require('express');
 const { protect, authorize } = require('../middlewares/auth');
 const {
-  bookLessonByAdmin,
+  bookLesson,
   getAllLessons,
   getLessonById,
   updateLessonById,
@@ -11,9 +11,13 @@ const {
 const router = express.Router();
 
 router.use(protect);
-router.use(authorize('admin'));
 
-router.route('/').post(bookLessonByAdmin).get(getAllLessons);
+router
+  .route('/')
+  .post(authorize('admin', 'student'), bookLesson)
+  .get(authorize('admin'), getAllLessons);
+
+router.use(authorize('admin'));
 
 router
   .route('/:lessonId')

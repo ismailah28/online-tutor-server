@@ -15,6 +15,11 @@ const {
   deleteSubject,
 } = require('../controllers/subject');
 
+const {
+  deleteRegisteredSubject,
+  tutorRegisterSubject,
+} = require('../controllers/user');
+
 const router = express.Router();
 
 router.use(protect);
@@ -35,5 +40,12 @@ router
   .get(getSubject)
   .put(authorize('admin'), updateSubject)
   .delete(authorize('admin'), deleteSubject);
+
+router
+  .route('/:catId/subjects/:subId/register')
+  .put(authorize('tutor'), tutorRegisterSubject);
+router
+  .route('/:catId/subjects/:subId/delete')
+  .put(authorize('tutor'), deleteRegisteredSubject);
 
 module.exports = router;
