@@ -3,6 +3,8 @@ const mongoose = require('mongoose');
 const categorySchema = new mongoose.Schema({
   name: {
     type: String,
+    enum: ['jss', 'sss', 'primary'],
+    lowercase: true,
     required: [true, 'Please add a category name'],
     unique: true,
   },
@@ -12,7 +14,9 @@ const categorySchema = new mongoose.Schema({
 
 // Cascade delete subjects when a category is deleted
 categorySchema.pre('remove', async function (next) {
-  console.log(`Subjects being removed from category ${this._id}-${this.name}`);
+  console.log(
+    `Subjects being removed from category ${this._id} - ${this.name}`
+  );
   await this.model('Subject').deleteMany({ category: this._id });
   next();
 });

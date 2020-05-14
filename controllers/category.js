@@ -15,10 +15,19 @@ exports.getCategories = asyncHandler(async (req, res, next) => {
 // @route     POST /api/v1/categories
 // @access    Private/Admin
 exports.addCategory = asyncHandler(async (req, res, next) => {
-  const { name, description } = req.body;
+  let { name } = req.body;
+
+  name = name.toLowerCase();
+
+  if (!(name === 'primary' || name === 'sss' || name === 'jss')) {
+    return next(new ErrorResponse('Please provide a valid category name', 400));
+  }
 
   // Create category
-  const category = await Category.create({ name, description });
+  const category = await Category.create({
+    name,
+    description: req.body.description,
+  });
 
   res.status(201).json({ success: true, data: category });
 });
@@ -27,12 +36,20 @@ exports.addCategory = asyncHandler(async (req, res, next) => {
 // @route     PUT /api/v1/categories/:catId
 // @access    Private/Admin
 exports.updateCategory = asyncHandler(async (req, res, next) => {
+  let category = await Category.findById(req.params.catId);
+
+  // check if category exists!
+  if (!category) {
+    return next(
+      new ErrorResponse(`Category with Id: ${req.params.catId} not found!`, 404)
+    );
+  }
   const fieldsToUpdate = {
     name: req.body.name,
     description: req.body.description,
   };
 
-  const category = await Category.findByIdAndUpdate(
+  category = await Category.findByIdAndUpdate(
     req.params.catId,
     fieldsToUpdate,
     {
