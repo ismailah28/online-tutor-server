@@ -31,6 +31,10 @@ yarn start
 
 ## Demo
 
+The API is live [here](https://startng-tutor.herokuapp.com/)
+
+Extensive documentation with examples [here](https://documenter.getpostman.com/view/6195417/SzmfXc9n)
+
 ### Admin Login
 
 > email: `admin@tutorial.com`
@@ -41,14 +45,25 @@ yarn start
 
 ### Responses
 
+#### Success
+
 ```javascript
 {
-  "success": bool,
+  "success": true,
   "data": array||object||string
 }
 ```
 
-### Status Code
+#### Failure
+
+```javascript
+{
+  "success": false,
+  "data": string
+}
+```
+
+#### Status Code
 
 | Status Code | Description  |
 | :---------- | :----------- |
@@ -59,40 +74,66 @@ yarn start
 | 403         | Forbidden    |
 | 404         | Not Found    |
 
+### Headers
+
+All endpoints except for login and signup have the following headers properties set
+
+| Key           | Value            |
+| :------------ | :--------------- |
+| Content-Type  | application/json |
+| Authorization | Token            |
+
 ### Authentication
 
 Create, read and update users
 
-#### POST Sign In
+> #### POST Sign In
 
 Sign a user in to retrieve access token
 
-```
+```javascript
 POST https://startng-tutor.herokuapp.com/api/v1/auth/sign-up
 ```
 
 ##### Body
 
-```
+| Property | Description           |          |
+| :------- | :-------------------- | :------- |
+| email    | Email address of user | required |
+| password | Password of user      | required |
+
+Example
+
+```javascript
 {
 	"email": "student@tutorial.com",
 	"password": "123456"
 }
 ```
 
-#### POST Sign Up
+> #### POST Sign Up
 
 Create new user with student or tutor role.
 
 _NB: You can't sign up as admin._
 
-```
+```javascript
 POST https://startng-tutor.herokuapp.com/api/v1/auth/sign-up
 ```
 
 ##### Body
 
-```
+| Property  | Description                  |          |
+| :-------- | :--------------------------- | :------- |
+| firstName | First name of user           | required |
+| lastName  | Last name of user            | required |
+| email     | Email address of user        | required |
+| role      | User role [tutor or student] | required |
+| password  | Password of user             | required |
+
+Example
+
+```javascript
 {
 	"firstName": "student",
 	"lastName": "123456",
@@ -106,54 +147,47 @@ POST https://startng-tutor.herokuapp.com/api/v1/auth/sign-up
 
 Create, read, update and delete category
 
-#### POST Add Category
+> #### POST Add Category
 
 Create category for subjects. Category can be Primary, JSS and SSS.
 
-```
+```javascript
 POST https://startng-tutor.herokuapp.com/api/v1/categories
 ```
 
 ##### Access - Admin User
 
-##### Headers
-
-| Key           | Value            |
-| :------------ | :--------------- |
-| Content-Type  | application/json |
-| Authorization | Token            |
-
 ##### Body
 
-```
+| Property    | Description              |          |
+| :---------- | :----------------------- | :------- |
+| name        | Name of category         | required |
+| description | Text describing category | optional |
+
+Example
+
+```javascript
 {
 	"name": "SSS",
 	"description": "Category for all junior secondary education"
 }
 ```
 
-#### GET Retrieve all Categories
+> #### GET Retrieve all Categories
 
-Get all categories
+Retrieve all categories
 
-```
+```javascript
 GET https://startng-tutor.herokuapp.com/api/v1/categories
 ```
 
-##### Access - All Users
+##### Access - All Authenticated Users
 
-##### Headers
+> #### GET Retrieve a Category
 
-```
-Content-Type    application/json
-Authorization   Token
-```
+Get a category by Id
 
-#### GET Retrieve a Category
-
-- Get a category by Id
-
-```
+```javascript
 GET https://startng-tutor.herokuapp.com/api/v1/categories/:catId
 ```
 
@@ -163,18 +197,11 @@ GET https://startng-tutor.herokuapp.com/api/v1/categories/:catId
 
 - catId - Category Id
 
-##### Headers
+> #### PUT Update a Category
 
-| Key           | Value            |
-| :------------ | :--------------- |
-| Content-Type  | application/json |
-| Authorization | Token            |
+Update a category by Id
 
-#### PUT Update a Category
-
-- Update a category by Id
-
-```
+```javascript
 PUT https://startng-tutor.herokuapp.com/api/v1/categories/:catId
 ```
 
@@ -184,27 +211,27 @@ PUT https://startng-tutor.herokuapp.com/api/v1/categories/:catId
 
 - catId - Category Id
 
-##### Headers
-
-| Key           | Value            |
-| :------------ | :--------------- |
-| Content-Type  | application/json |
-| Authorization | Token            |
-
 ##### Body
 
-```
+| Property    | Description                  |          |
+| :---------- | :--------------------------- | :------- |
+| name        | New category name            | required |
+| description | New text describing category | optional |
+
+Example
+
+```javascript
 {
 	"name": "SSS",
 	"description": "Category for all junior secondary education"
 }
 ```
 
-#### DELETE Delete a Category
+> #### DELETE Delete a Category
 
 Delete a category by Id
 
-```
+```javascript
 DELETE https://startng-tutor.herokuapp.com/api/v1/categories/:catId
 ```
 
@@ -214,20 +241,13 @@ DELETE https://startng-tutor.herokuapp.com/api/v1/categories/:catId
 
 - catId - Category Id
 
-##### Headers
-
-| Key           | Value            |
-| :------------ | :--------------- |
-| Content-Type  | application/json |
-| Authorization | Token            |
-
 ### Subject
 
-#### POST Add Subject
+> #### POST Add Subject
 
 Create subjects under a category of Id, catId.
 
-```
+```javascript
 POST https://startng-tutor.herokuapp.com/api/v1/categories/:catId/subject
 ```
 
@@ -237,27 +257,27 @@ POST https://startng-tutor.herokuapp.com/api/v1/categories/:catId/subject
 
 - catId - Category Id
 
-##### Headers
-
-| Key           | Value            |
-| :------------ | :--------------- |
-| Content-Type  | application/json |
-| Authorization | Token            |
-
 ##### Body
 
-```
+| Property    | Description             |          |
+| :---------- | :---------------------- | :------- |
+| name        | Name of subject         | required |
+| description | Text describing subject | optional |
+
+Example
+
+```javascript
 {
 	"name": "English Language",
 	"description": "Language subject for junior secondary."
 }
 ```
 
-#### GET Retrieve all Subjects
+> #### GET Retrieve all Subjects
 
 Retrieve all subjects under a category of Id, catId.
 
-```
+```javascript
 GET https://startng-tutor.herokuapp.com/api/v1/categories/:catId/subject
 ```
 
@@ -267,18 +287,11 @@ GET https://startng-tutor.herokuapp.com/api/v1/categories/:catId/subject
 
 - catId - Category Id
 
-##### Headers
-
-| Key           | Value            |
-| :------------ | :--------------- |
-| Content-Type  | application/json |
-| Authorization | Token            |
-
-#### GET Retrieve a Subject
+> #### GET Retrieve a Subject
 
 Retrieve a subject under a category of Id, catId by the subject Id, subId.
 
-```
+```javascript
 GET https://startng-tutor.herokuapp.com/api/v1/categories/:catId/subject/:subId
 ```
 
@@ -291,16 +304,11 @@ GET https://startng-tutor.herokuapp.com/api/v1/categories/:catId/subject/:subId
 
 ##### Headers
 
-| Key           | Value            |
-| :------------ | :--------------- |
-| Content-Type  | application/json |
-| Authorization | Token            |
-
-#### PUT Update a Subject
+> #### PUT Update a Subject
 
 Update a subject under a category of Id, catId by the subject Id, subId.
 
-```
+```javascript
 PUT https://startng-tutor.herokuapp.com/api/v1/categories/:catId/subject/:subId
 ```
 
@@ -311,18 +319,11 @@ PUT https://startng-tutor.herokuapp.com/api/v1/categories/:catId/subject/:subId
 - catId - Category Id
 - subId - Subject Id
 
-##### Headers
-
-| Key           | Value            |
-| :------------ | :--------------- |
-| Content-Type  | application/json |
-| Authorization | Token            |
-
-#### DELETE Delete a Subject
+> #### DELETE Delete a Subject
 
 Delete a subject under a category of Id, catId by the subject Id, subId.
 
-```
+```javascript
 DELETE https://startng-tutor.herokuapp.com/api/v1/categories/:catId/subject/:subId
 ```
 
@@ -333,82 +334,63 @@ DELETE https://startng-tutor.herokuapp.com/api/v1/categories/:catId/subject/:sub
 - catId - Category Id
 - subId - Subject Id
 
-##### Headers
-
-| Key           | Value            |
-| :------------ | :--------------- |
-| Content-Type  | application/json |
-| Authorization | Token            |
-
-#### GET Search a Subject by subject name
+> #### GET Search a Subject by subject name
 
 Search a subject by name sorted alphabetically.
 
-```
+```javascript
 GET https://startng-tutor.herokuapp.com/api/v1/subjects?name=subject_name
 ```
 
 ##### Access - All Users
 
-##### Headers
-
-| Key           | Value            |
-| :------------ | :--------------- |
-| Content-Type  | application/json |
-| Authorization | Token            |
-
 ### Lesson
 
-#### POST Book a Lesson
+> #### POST Book a Lesson
 
 Student can book a lesson or admin can book a lesson for a student
 
-```
+```javascript
 POST https://startng-tutor.herokuapp.com/api/v1/lessons
 ```
 
 ##### Access - Admin, Student User
 
-##### Headers
-
-| Key           | Value            |
-| :------------ | :--------------- |
-| Content-Type  | application/json |
-| Authorization | Token            |
-
 ##### Body
 
-```
+| Property     | Description                    |                                                        |
+| :----------- | :----------------------------- | :----------------------------------------------------- |
+| studentEmail | Email address of student       | required but optional if student is making the request |
+| tutorEmail   | Email address of tutor of user | required                                               |
+| category     | Name of subject category       | required                                               |
+| subject      | Name of subject                | required                                               |
+
+Example
+
+```javascript
 {
-	"studentEmail": "student@tutorial.com", - optional for student booking lessons
-	"tutorEmail": "tutor@tutorial.com",
+  "studentEmail": "student@tutorial.com",
+  "tutorEmail": "tutor@tutorial.com",
   "category": "jss",
   "subject": "English Language"
 }
 ```
 
-#### GET Retrieve all Lessons
+> #### GET Retrieve all Lessons
 
 Retrieve all lessons.
 
-```
+```javascript
 GET https://startng-tutor.herokuapp.com/api/v1/lessons
 ```
 
 ##### Access - Admin Users
 
-##### Headers
-
-| Key           | Value            |
-| :------------ | :--------------- |
-| Content-Type  | application/json |
-| Authorization | Token            |
-
-#### GET Retrieve a Lesson
+> #### GET Retrieve a Lesson
 
 Retrieve a lesson by Id.
 
-```
+```javascript
 GET https://startng-tutor.herokuapp.com/api/v1/lessons/:lessonId
 ```
 
@@ -418,18 +400,11 @@ GET https://startng-tutor.herokuapp.com/api/v1/lessons/:lessonId
 
 - lessonId - Lesson Id
 
-##### Headers
-
-| Key           | Value            |
-| :------------ | :--------------- |
-| Content-Type  | application/json |
-| Authorization | Token            |
-
-#### DELETE Delete a Lesson
+> #### DELETE Delete a Lesson
 
 Delete a lesson by Id.
 
-```
+```javascript
 DELETE https://startng-tutor.herokuapp.com/api/v1/lessons/:lessonId
 ```
 
@@ -439,54 +414,33 @@ DELETE https://startng-tutor.herokuapp.com/api/v1/lessons/:lessonId
 
 - lessonId - Lesson Id
 
-##### Headers
-
-| Key           | Value            |
-| :------------ | :--------------- |
-| Content-Type  | application/json |
-| Authorization | Token            |
-
 ### Tutor
 
-#### GET Search Tutor by Name
+> #### GET Search Tutor by Name
 
 Search for tutors by first name sorted alphabetically
 
-```
+```javascript
 GET https://startng-tutor.herokuapp.com/api/v1/users?name=name
 ```
 
 ##### Access - All User
 
-##### Headers
-
-| Key           | Value            |
-| :------------ | :--------------- |
-| Content-Type  | application/json |
-| Authorization | Token            |
-
-#### GET Retireve all Tutors
+> #### GET Retireve all Tutors
 
 Get all tutors
 
-```
+```javascript
 GET https://startng-tutor.herokuapp.com/api/v1/users/tutors
 ```
 
 ##### Access - Admin Users
 
-##### Headers
-
-| Key           | Value            |
-| :------------ | :--------------- |
-| Content-Type  | application/json |
-| Authorization | Token            |
-
-#### GET Retireve Tutor by Id
+> #### GET Retireve Tutor by Id
 
 Get a tutor by Id
 
-```
+```javascript
 GET https://startng-tutor.herokuapp.com/api/v1/users/tutors/:tutId
 ```
 
@@ -496,18 +450,11 @@ GET https://startng-tutor.herokuapp.com/api/v1/users/tutors/:tutId
 
 - tutId - Tutor Id
 
-##### Headers
-
-| Key           | Value            |
-| :------------ | :--------------- |
-| Content-Type  | application/json |
-| Authorization | Token            |
-
-#### PUT Deactivate Tutor by Id
+> #### PUT Deactivate Tutor by Id
 
 Deactivate a tutor by Id
 
-```
+```javascript
 PUT https://startng-tutor.herokuapp.com/api/v1/users/tutors/:tutId
 ```
 
@@ -517,18 +464,11 @@ PUT https://startng-tutor.herokuapp.com/api/v1/users/tutors/:tutId
 
 - tutId - Tutor Id
 
-##### Headers
-
-| Key           | Value            |
-| :------------ | :--------------- |
-| Content-Type  | application/json |
-| Authorization | Token            |
-
-#### Tutor Register for a Subject in a Category
+> #### Tutor Register for a Subject in a Category
 
 Tutor registers to take a subject
 
-```
+```javascript
 PUT http://localhost:5000/api/v1/category/:catId/subjects/:subId/register
 ```
 
@@ -539,69 +479,46 @@ PUT http://localhost:5000/api/v1/category/:catId/subjects/:subId/register
 - catId - Category Id
 - subId - Subject Id
 
-##### Headers
-
-| Key           | Value            |
-| :------------ | :--------------- |
-| Content-Type  | application/json |
-| Authorization | Token            |
-
-#### GET Retrieve all subjects taken by Tutor
+> #### GET Retrieve all subjects taken by Tutor
 
 Retrieve all subjects taken by Tutor
 
-```
+```javascript
 GET https://startng-tutor.herokuapp.com/api/v1/users/tutors/subjects
 ```
 
 ##### Access - Tutor Users
 
-##### Headers
-
-| Key           | Value            |
-| :------------ | :--------------- |
-| Content-Type  | application/json |
-| Authorization | Token            |
-
-#### PUT Delete Registered subject
+> #### PUT Delete Registered subject
 
 Tutor can de-register a registered subject
 
-```
+```javascript
 PUT http://localhost:5000/api/v1/category/:catId/subjects/:subId/delete
 ```
 
 ##### Access - Tutor Users
 
-##### Headers
+##### Params
 
-| Key           | Value            |
-| :------------ | :--------------- |
-| Content-Type  | application/json |
-| Authorization | Token            |
+- catId - Category Id
+- subId - Subject Id
 
-#### PUT Make Admin Tutor
+> #### PUT Make Admin Tutor
 
 Admin can become a tutor.
 
-```
+```javascript
 PUT http://localhost:5000/api/v1/users/make-tutor
 ```
 
 ##### Access - Admin Users
 
-##### Headers
-
-| Key           | Value            |
-| :------------ | :--------------- |
-| Content-Type  | application/json |
-| Authorization | Token            |
-
-#### PUT Make Tutor Amin
+> #### PUT Make Tutor Amin
 
 Admin can make a tutor admin
 
-```
+```javascript
 PUT http://localhost:5000/api/v1/users/tutors/:tutId/make-admin
 ```
 
@@ -611,16 +528,7 @@ PUT http://localhost:5000/api/v1/users/tutors/:tutId/make-admin
 
 - tutId - Tutor Id
 
-##### Headers
-
-| Key           | Value            |
-| :------------ | :--------------- |
-| Content-Type  | application/json |
-| Authorization | Token            |
-
-The API is live [here](https://startng-tutor.herokuapp.com/)
-
-Extensive documentation with examples [here](https://documenter.getpostman.com/view/6195417/SzmfXc9n)
+#
 
 - Version: 1.0.0
 - License: MIT
